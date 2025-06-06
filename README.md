@@ -195,8 +195,7 @@ FUR provides detailed error messages for common issues:
 
 ## License
 
-[Add your license information here]
-
+This project is licensed under the AGPL-3.0 License. 
 ## Support
 
 For issues and questions:
@@ -206,4 +205,4 @@ For issues and questions:
 
 ---
 
-**Note**: Make sure the FUR API server is running on `http://localhost:5001` before using the package manager.
+**Note**: Make sure the FUR API server is running on `http://localhost:5001` before using the package manager for now while it's in development. The API server will be included in future releases.
