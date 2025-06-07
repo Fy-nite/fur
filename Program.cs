@@ -53,10 +53,19 @@ namespace Fur
                 await packageManager.GetPackageInfoAsync(package, version);
             }, infoPackageArg, versionOption);
 
+            // Stats command
+            var statsCommand = new Command("stats", "Show repository statistics");
+            statsCommand.SetHandler(async () =>
+            {
+                var packageManager = new PackageManager();
+                await packageManager.ShowStatisticsAsync();
+            });
+
             rootCommand.AddCommand(installCommand);
             rootCommand.AddCommand(searchCommand);
             rootCommand.AddCommand(listCommand);
             rootCommand.AddCommand(infoCommand);
+            rootCommand.AddCommand(statsCommand);
 
             return await rootCommand.InvokeAsync(args);
         }
