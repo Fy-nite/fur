@@ -71,7 +71,20 @@ public class PackageManager
             if (File.Exists(installerPath))
             {
                 ConsoleHelper.WriteStep("Running", packageInfo.Installer);
-                await RunInstallerScript(installerPath, showOutput: true);
+                try
+                {
+                    await RunInstallerScript(installerPath, showOutput: true);
+                    ConsoleHelper.WriteSuccess("Installer completed successfully");
+                }
+                catch (Exception ex)
+                {
+                    ConsoleHelper.WriteError($"Installer failed: {ex.Message}");
+                    throw; // Re-throw to prevent marking package as successfully installed
+                }
+            }
+            else
+            {
+                ConsoleHelper.WriteWarning($"Installer script '{packageInfo.Installer}' not found, skipping");
             }
         }
 
@@ -157,8 +170,8 @@ public class PackageManager
 
         if (command == null)
         {
-            Console.WriteLine($"Unsupported script type: {extension}");
-            return;
+            ConsoleHelper.WriteError($"Unsupported script type: {extension}");
+            throw new Exception($"Cannot execute installer with unsupported extension: {extension}");
         }
 
         await RunCommandAsync(command, arguments, showOutput);
@@ -440,7 +453,7 @@ public class PackageManager
 
         if (process.ExitCode != 0)
         {
-            var error = showOutput ? $"Command exited with code {process.ExitCode}" 
+            var error = showOutput ? $"Process exited with code {process.ExitCode}" 
                                    : await process.StandardError.ReadToEndAsync();
             throw new Exception($"Command failed: {error}");
         }
