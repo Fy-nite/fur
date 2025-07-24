@@ -1,0 +1,5 @@
+{
+  "repositories": [
+    "http://testing.finite.ovh:8080"
+  ]
+}

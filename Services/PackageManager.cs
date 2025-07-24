@@ -10,9 +10,11 @@ public class PackageManager
     private readonly ApiService _apiService;
     private readonly string _packagesDirectory;
 
-    public PackageManager()
+    public PackageManager(string[]? repositoryUrls = null)
     {
-        _apiService = new ApiService();
+        _apiService = repositoryUrls != null
+            ? new ApiService(repositoryUrls)
+            : new ApiService();
         _packagesDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".fur", "packages");
         Directory.CreateDirectory(_packagesDirectory);
     }
@@ -394,6 +396,67 @@ public class PackageManager
         Console.WriteLine($"📂 Git: {packageInfo.Git}");
         Console.WriteLine($"⚙️  Installer: {packageInfo.Installer}");
         Console.WriteLine($"📋 Dependencies: {string.Join(", ", packageInfo.Dependencies)}");
+    }
+
+    public async Task UpgradePackageAsync(string packageSpec)
+    {
+        var (packageName, version) = ParsePackageSpec(packageSpec);
+        ConsoleHelper.WriteStep("Upgrading", packageName + (version != null ? $"@{version}" : ""));
+        await InstallPackageAsync(packageName + (version != null ? $"@{version}" : ""));
+    }
+
+    public async Task DowngradePackageAsync(string packageSpec)
+    {
+        var (packageName, version) = ParsePackageSpec(packageSpec);
+        ConsoleHelper.WriteStep("Downgrading", packageName + (version != null ? $"@{version}" : ""));
+        await InstallPackageAsync(packageName + (version != null ? $"@{version}" : ""));
+    }
+
+    public async Task UninstallPackageAsync(string packageName)
+    {
+        var packageDir = Path.Combine(_packagesDirectory, packageName);
+        if (!Directory.Exists(packageDir))
+        {
+            ConsoleHelper.WriteWarning($"Package '{packageName}' is not installed");
+            return;
+        }
+
+        // Run uninstall script if present
+        var configPath = Path.Combine(packageDir, "furconfig.json");
+        if (File.Exists(configPath))
+        {
+            var configJson = await File.ReadAllTextAsync(configPath);
+            var packageInfo = JsonSerializer.Deserialize<FurConfig>(configJson);
+            if (packageInfo != null && !string.IsNullOrEmpty(packageInfo.Installer))
+            {
+                var uninstallScript = packageInfo.Installer.Replace("install", "uninstall");
+                var uninstallPath = Path.Combine(packageDir, uninstallScript);
+                if (File.Exists(uninstallPath))
+                {
+                    ConsoleHelper.WriteStep("Running", uninstallScript);
+                    try
+                    {
+                        await RunInstallerScript(uninstallPath, showOutput: true);
+                        ConsoleHelper.WriteSuccess("Uninstaller completed successfully");
+                    }
+                    catch (Exception ex)
+                    {
+                        ConsoleHelper.WriteError($"Uninstaller failed: {ex.Message}");
+                    }
+                }
+            }
+        }
+
+        // Remove package directory
+        try
+        {
+            Directory.Delete(packageDir, true);
+            ConsoleHelper.WriteSuccess($"Uninstalled {packageName}");
+        }
+        catch (Exception ex)
+        {
+            ConsoleHelper.WriteError($"Failed to uninstall: {ex.Message}");
+        }
     }
 
     private static (string name, string? version) ParsePackageSpec(string packageSpec)

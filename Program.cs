@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using System.Text.Json;
 using Fur.Services;
 using Fur.Models;
 
@@ -8,6 +9,18 @@ namespace Fur
     {
         static async Task<int> Main(string[] args)
         {
+            // Load fursettings.json for repository URLs
+            var configPath = Path.Combine(AppContext.BaseDirectory, "fursettings.json");
+            FurSettings settings;
+            if (File.Exists(configPath))
+            {
+                var json = await File.ReadAllTextAsync(configPath);
+                settings = JsonSerializer.Deserialize<FurSettings>(json) ?? new FurSettings();
+            }
+            else
+            {
+                settings = new FurSettings();
+            }
 
             var rootCommand = new RootCommand("FUR - Finite User Repository Package Manager");
 
@@ -17,7 +30,7 @@ namespace Fur
             installCommand.AddArgument(packageArg);
             installCommand.SetHandler(async (string package) =>
             {
-                var packageManager = new PackageManager();
+                var packageManager = new PackageManager(settings.RepositoryUrls);
                 await packageManager.InstallPackageAsync(package);
             }, packageArg);
 
@@ -27,7 +40,7 @@ namespace Fur
             searchCommand.AddArgument(queryArg);
             searchCommand.SetHandler(async (string query) =>
             {
-                var packageManager = new PackageManager();
+                var packageManager = new PackageManager(settings.RepositoryUrls);
                 await packageManager.SearchPackagesAsync(query);
             }, queryArg);
 
@@ -37,7 +50,7 @@ namespace Fur
             listCommand.AddOption(sortOption);
             listCommand.SetHandler(async (string sort) =>
             {
-                var packageManager = new PackageManager();
+                var packageManager = new PackageManager(settings.RepositoryUrls);
                 await packageManager.ListPackagesAsync(sort);
             }, sortOption);
 
@@ -49,7 +62,7 @@ namespace Fur
             infoCommand.AddOption(versionOption);
             infoCommand.SetHandler(async (string package, string version) =>
             {
-                var packageManager = new PackageManager();
+                var packageManager = new PackageManager(settings.RepositoryUrls);
                 await packageManager.GetPackageInfoAsync(package, version);
             }, infoPackageArg, versionOption);
 
@@ -57,15 +70,48 @@ namespace Fur
             var statsCommand = new Command("stats", "Show repository statistics");
             statsCommand.SetHandler(async () =>
             {
-                var packageManager = new PackageManager();
+                var packageManager = new PackageManager(settings.RepositoryUrls);
                 await packageManager.ShowStatisticsAsync();
             });
+
+            // Upgrade command
+            var upgradeCommand = new Command("upgrade", "Upgrade a package to a specific version");
+            var upgradeArg = new Argument<string>("package", "Package name with optional version (name@version)");
+            upgradeCommand.AddArgument(upgradeArg);
+            upgradeCommand.SetHandler(async (string package) =>
+            {
+                var packageManager = new PackageManager(settings.RepositoryUrls);
+                await packageManager.UpgradePackageAsync(package);
+            }, upgradeArg);
+
+            // Downgrade command
+            var downgradeCommand = new Command("downgrade", "Downgrade a package to a specific version");
+            var downgradeArg = new Argument<string>("package", "Package name with optional version (name@version)");
+            downgradeCommand.AddArgument(downgradeArg);
+            downgradeCommand.SetHandler(async (string package) =>
+            {
+                var packageManager = new PackageManager(settings.RepositoryUrls);
+                await packageManager.DowngradePackageAsync(package);
+            }, downgradeArg);
+
+            // Uninstall command
+            var uninstallCommand = new Command("uninstall", "Uninstall a package");
+            var uninstallArg = new Argument<string>("package", "Package name");
+            uninstallCommand.AddArgument(uninstallArg);
+            uninstallCommand.SetHandler(async (string package) =>
+            {
+                var packageManager = new PackageManager(settings.RepositoryUrls);
+                await packageManager.UninstallPackageAsync(package);
+            }, uninstallArg);
 
             rootCommand.AddCommand(installCommand);
             rootCommand.AddCommand(searchCommand);
             rootCommand.AddCommand(listCommand);
             rootCommand.AddCommand(infoCommand);
             rootCommand.AddCommand(statsCommand);
+            rootCommand.AddCommand(upgradeCommand);
+            rootCommand.AddCommand(downgradeCommand);
+            rootCommand.AddCommand(uninstallCommand);
 
             return await rootCommand.InvokeAsync(args);
         }

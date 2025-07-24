@@ -7,178 +7,190 @@ namespace Fur.Services;
 public class ApiService : IDisposable
 {
     private readonly HttpClient _httpClient;
-    // Changed to HTTP for local development - update this when deploying
-    private const string BaseUrl = "http://testing.finite.ovh:8080"; 
+    private readonly string[] _baseUrls;
 
-    public ApiService()
+    public ApiService(string[] baseUrls)
     {
         _httpClient = new HttpClient();
-        // Add timeout to prevent hanging
         _httpClient.Timeout = TimeSpan.FromSeconds(30);
+        _baseUrls = baseUrls;
     }
+
+    // For backward compatibility
+    public ApiService() : this(new[] { "http://testing.finite.ovh:8080" }) {}
 
     public async Task<FurConfig?> GetPackageInfoAsync(string packageName, string? version = null)
     {
-        var url = version != null 
-            ? $"{BaseUrl}/api/v1/packages/{packageName}/{version}"
-            : $"{BaseUrl}/api/v1/packages/{packageName}";
+        foreach (var baseUrl in _baseUrls)
+        {
+            var url = version != null
+                ? $"{baseUrl}/api/v1/packages/{packageName}/{version}"
+                : $"{baseUrl}/api/v1/packages/{packageName}";
 
-        try
-        {
-            var response = await _httpClient.GetAsync(url);
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var json = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<FurConfig>(json);
+                var response = await _httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    return JsonSerializer.Deserialize<FurConfig>(json);
+                }
+                else
+                {
+                    await HandleErrorResponse(response);
+                }
             }
-            else
+            catch (HttpRequestException ex)
             {
-                ConsoleHelper.WriteError($"API returned {response.StatusCode}: {response.ReasonPhrase}");
+                ConsoleHelper.WriteError($"Network error: {ex.Message}");
+                ConsoleHelper.WriteInfo($"Make sure the FUR API server at {baseUrl} is running");
+            }
+            catch (Exception ex)
+            {
+                ConsoleHelper.WriteError($"Error fetching package info from {baseUrl}: {ex.Message}");
             }
         }
-        catch (HttpRequestException ex)
-        {
-            ConsoleHelper.WriteError($"Network error: {ex.Message}");
-            ConsoleHelper.WriteInfo("Make sure the FUR API server is running");
-        }
-        catch (Exception ex)
-        {
-            ConsoleHelper.WriteError($"Error fetching package info: {ex.Message}");
-        }
-
         return null;
     }
 
     public async Task<PackageListResponse?> GetPackagesAsync(string? sort = null, int page = 1, int pageSize = 50)
     {
-        var url = $"{BaseUrl}/api/v1/packages?page={page}&pageSize={pageSize}";
-        if (!string.IsNullOrEmpty(sort))
+        foreach (var baseUrl in _baseUrls)
         {
-            url += $"&sort={sort}";
-        }
-
-        try
-        {
-            var response = await _httpClient.GetAsync(url);
-            if (response.IsSuccessStatusCode)
+            var url = $"{baseUrl}/api/v1/packages?page={page}&pageSize={pageSize}";
+            if (!string.IsNullOrEmpty(sort))
             {
-                var json = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<PackageListResponse>(json);
+                url += $"&sort={sort}";
             }
-            else
-            {
-                await HandleErrorResponse(response);
-            }
-        }
-        catch (HttpRequestException ex)
-        {
-            ConsoleHelper.WriteError($"Network error: {ex.Message}");
-            ConsoleHelper.WriteInfo("Make sure the FUR API server is running");
-        }
-        catch (Exception ex)
-        {
-            ConsoleHelper.WriteError($"Error fetching packages: {ex.Message}");
-        }
 
+            try
+            {
+                var response = await _httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    return JsonSerializer.Deserialize<PackageListResponse>(json);
+                }
+                else
+                {
+                    await HandleErrorResponse(response);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                ConsoleHelper.WriteError($"Network error: {ex.Message}");
+                ConsoleHelper.WriteInfo($"Make sure the FUR API server at {baseUrl} is running");
+            }
+            catch (Exception ex)
+            {
+                ConsoleHelper.WriteError($"Error fetching packages from {baseUrl}: {ex.Message}");
+            }
+        }
         return null;
     }
 
     public async Task<PackageListResponse?> SearchPackagesAsync(string query, bool includeDetails = true)
     {
-        var url = $"{BaseUrl}/api/v1/packages?search={Uri.EscapeDataString(query)}&details={includeDetails.ToString().ToLower()}";
+        foreach (var baseUrl in _baseUrls)
+        {
+            var url = $"{baseUrl}/api/v1/packages?search={Uri.EscapeDataString(query)}&details={includeDetails.ToString().ToLower()}";
 
-        try
-        {
-            var response = await _httpClient.GetAsync(url);
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var json = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<PackageListResponse>(json);
+                var response = await _httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    return JsonSerializer.Deserialize<PackageListResponse>(json);
+                }
+                else
+                {
+                    await HandleErrorResponse(response);
+                }
             }
-            else
+            catch (HttpRequestException ex)
             {
-                await HandleErrorResponse(response);
+                ConsoleHelper.WriteError($"Network error: {ex.Message}");
+                ConsoleHelper.WriteInfo($"Make sure the FUR API server at {baseUrl} is running");
+            }
+            catch (Exception ex)
+            {
+                ConsoleHelper.WriteError($"Error searching packages from {baseUrl}: {ex.Message}");
             }
         }
-        catch (HttpRequestException ex)
-        {
-            ConsoleHelper.WriteError($"Network error: {ex.Message}");
-            ConsoleHelper.WriteInfo("Make sure the FUR API server is running");
-        }
-        catch (Exception ex)
-        {
-            ConsoleHelper.WriteError($"Error searching packages: {ex.Message}");
-        }
-
         return null;
     }
 
     public async Task<RepositoryStatistics?> GetStatisticsAsync()
     {
-        var url = $"{BaseUrl}/api/v1/packages/statistics";
+        foreach (var baseUrl in _baseUrls)
+        {
+            var url = $"{baseUrl}/api/v1/packages/statistics";
 
-        try
-        {
-            var response = await _httpClient.GetAsync(url);
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var json = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<RepositoryStatistics>(json);
+                var response = await _httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    return JsonSerializer.Deserialize<RepositoryStatistics>(json);
+                }
+                else
+                {
+                    await HandleErrorResponse(response);
+                }
             }
-            else
+            catch (HttpRequestException ex)
             {
-                await HandleErrorResponse(response);
+                ConsoleHelper.WriteError($"Network error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                ConsoleHelper.WriteError($"Error fetching statistics from {baseUrl}: {ex.Message}");
             }
         }
-        catch (HttpRequestException ex)
-        {
-            ConsoleHelper.WriteError($"Network error: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            ConsoleHelper.WriteError($"Error fetching statistics: {ex.Message}");
-        }
-
         return null;
     }
 
     public async Task TrackDownloadAsync(string packageName)
     {
-        var url = $"{BaseUrl}/api/v1/packages/{packageName}/download";
-
-        try
+        foreach (var baseUrl in _baseUrls)
         {
-            var response = await _httpClient.PostAsync(url, null);
-            // Don't show errors for download tracking - it's not critical
-            if (!response.IsSuccessStatusCode && response.StatusCode != System.Net.HttpStatusCode.NotFound)
+            var url = $"{baseUrl}/api/v1/packages/{packageName}/download";
+            try
             {
-                Console.WriteLine($"Warning: Could not track download for {packageName}");
+                var response = await _httpClient.PostAsync(url, null);
+                if (!response.IsSuccessStatusCode && response.StatusCode != System.Net.HttpStatusCode.NotFound)
+                {
+                    Console.WriteLine($"Warning: Could not track download for {packageName} at {baseUrl}");
+                }
             }
-        }
-        catch
-        {
-            // Silently ignore download tracking errors
+            catch
+            {
+                // Silently ignore download tracking errors
+            }
         }
     }
 
     public async Task<HealthStatus?> CheckHealthAsync()
     {
-        var url = $"{BaseUrl}/api/v1/health";
-
-        try
+        foreach (var baseUrl in _baseUrls)
         {
-            var response = await _httpClient.GetAsync(url);
-            if (response.IsSuccessStatusCode)
+            var url = $"{baseUrl}/api/v1/health";
+            try
             {
-                var json = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<HealthStatus>(json);
+                var response = await _httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    return JsonSerializer.Deserialize<HealthStatus>(json);
+                }
+            }
+            catch
+            {
+                // Silently ignore health check errors
             }
         }
-        catch
-        {
-            // Silently ignore health check errors
-        }
-
         return null;
     }
 

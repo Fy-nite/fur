@@ -103,6 +103,28 @@ Packages are configured using a `furconfig.json` file in the repository root:
 - **installer**: Path to installation script (optional)
 - **dependencies**: List of package dependencies
 
+## Custom Package Sources
+
+You can specify multiple repository API URLs in a `fursettings.json` file in the application directory:
+
+```json
+{
+  "repositories": [
+    "http://localhost:5001",
+    "http://testing.finite.ovh:8080"
+  ]
+}
+```
+
+FUR will check each repository in order when searching for packages.
+
+## Package Management Commands
+
+- **Install**: `fur install package-name[@version]`
+- **Upgrade**: `fur upgrade package-name[@version]`
+- **Downgrade**: `fur downgrade package-name@older-version`
+- **Uninstall**: `fur uninstall package-name`
+
 ## API Integration
 
 FUR integrates with a REST API server for package management. The default configuration points to `http://localhost:5001`.
