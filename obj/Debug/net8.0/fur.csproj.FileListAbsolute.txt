@@ -29,3 +29,34 @@
 /Volumes/programs/fur/obj/Debug/net8.0/fur.pdb
 /Volumes/programs/fur/obj/Debug/net8.0/fur.genruntimeconfig.cache
 /Volumes/programs/fur/obj/Debug/net8.0/ref/fur.dll
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/fur
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/fur.deps.json
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/fur.runtimeconfig.json
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/fur.dll
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/fur.pdb
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/System.CommandLine.dll
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/cs/System.CommandLine.resources.dll
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/de/System.CommandLine.resources.dll
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/es/System.CommandLine.resources.dll
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/fr/System.CommandLine.resources.dll
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/it/System.CommandLine.resources.dll
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/ja/System.CommandLine.resources.dll
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/ko/System.CommandLine.resources.dll
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/pl/System.CommandLine.resources.dll
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/pt-BR/System.CommandLine.resources.dll
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/ru/System.CommandLine.resources.dll
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/tr/System.CommandLine.resources.dll
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/zh-Hans/System.CommandLine.resources.dll
+/run/media/charlies/the cat storage v2/fur/bin/Debug/net8.0/zh-Hant/System.CommandLine.resources.dll
+/run/media/charlies/the cat storage v2/fur/obj/Debug/net8.0/fur.csproj.AssemblyReference.cache
+/run/media/charlies/the cat storage v2/fur/obj/Debug/net8.0/fur.GeneratedMSBuildEditorConfig.editorconfig
+/run/media/charlies/the cat storage v2/fur/obj/Debug/net8.0/fur.AssemblyInfoInputs.cache
+/run/media/charlies/the cat storage v2/fur/obj/Debug/net8.0/fur.AssemblyInfo.cs
+/run/media/charlies/the cat storage v2/fur/obj/Debug/net8.0/fur.csproj.CoreCompileInputs.cache
+/run/media/charlies/the cat storage v2/fur/obj/Debug/net8.0/fur.sourcelink.json
+/run/media/charlies/the cat storage v2/fur/obj/Debug/net8.0/fur.csproj.Up2Date
+/run/media/charlies/the cat storage v2/fur/obj/Debug/net8.0/fur.dll
+/run/media/charlies/the cat storage v2/fur/obj/Debug/net8.0/refint/fur.dll
+/run/media/charlies/the cat storage v2/fur/obj/Debug/net8.0/fur.pdb
+/run/media/charlies/the cat storage v2/fur/obj/Debug/net8.0/fur.genruntimeconfig.cache
+/run/media/charlies/the cat storage v2/fur/obj/Debug/net8.0/ref/fur.dll

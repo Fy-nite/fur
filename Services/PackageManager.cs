@@ -168,7 +168,9 @@ public class PackageManager
     private async Task RunInstallerScript(string scriptPath, bool showOutput)
     {
         var extension = Path.GetExtension(scriptPath).ToLowerInvariant();
-        var (command, arguments) = GetShellForScript(extension, scriptPath);
+        var scriptDirectory = Path.GetDirectoryName(scriptPath);
+        var scriptFileName = Path.GetFileName(scriptPath);
+        var (command, arguments) = GetShellForScript(extension, scriptFileName);
 
         if (command == null)
         {
@@ -176,70 +178,31 @@ public class PackageManager
             throw new Exception($"Cannot execute installer with unsupported extension: {extension}");
         }
 
-        await RunCommandAsync(command, arguments, showOutput);
+        await RunCommandAsync(command, arguments, scriptDirectory, showOutput);
     }
 
-    private static (string? command, string arguments) GetShellForScript(string extension, string scriptPath)
+    private static (string? command, string arguments) GetShellForScript(string extension, string scriptFileName)
     {
         return extension switch
         {
-            ".sh" => ("bash", scriptPath),
-            ".ps1" => ("pwsh", $"-ExecutionPolicy Bypass -File \"{scriptPath}\""),
-            ".py" => ("python", scriptPath),
-            ".js" => ("node", scriptPath),
-            ".rb" => ("ruby", scriptPath),
+            ".sh" => ("bash", scriptFileName),
+            ".ps1" => ("pwsh", $"-ExecutionPolicy Bypass -File \"{scriptFileName}\""),
+            ".py" => ("python", scriptFileName),
+            ".js" => ("node", scriptFileName),
+            ".rb" => ("ruby", scriptFileName),
             ".cmd" or ".bat" => (OperatingSystem.IsWindows() ? "cmd" : null, 
-                                OperatingSystem.IsWindows() ? $"/c \"{scriptPath}\"" : ""),
-            ".exe" => (OperatingSystem.IsWindows() ? scriptPath : null, ""),
-            "" => DetermineShellForExtensionlessScript(scriptPath),
+                                OperatingSystem.IsWindows() ? $"/c \"{scriptFileName}\"" : ""),
+            ".exe" => (OperatingSystem.IsWindows() ? scriptFileName : null, ""),
+            "" => DetermineShellForExtensionlessScript(scriptFileName),
             _ => (null, "")
         };
     }
 
-    private static (string? command, string arguments) DetermineShellForExtensionlessScript(string scriptPath)
+    private static (string? command, string arguments) DetermineShellForExtensionlessScript(string scriptFileName)
     {
-        // For extensionless scripts, try to read the shebang line
-        try
-        {
-            var firstLine = File.ReadLines(scriptPath).FirstOrDefault();
-            if (firstLine?.StartsWith("#!") == true)
-            {
-                var shebang = firstLine[2..].Trim();
-                
-                // Common shebang patterns
-                if (shebang.Contains("bash") || shebang.Contains("sh"))
-                    return ("bash", scriptPath);
-                if (shebang.Contains("python"))
-                    return ("python", scriptPath);
-                if (shebang.Contains("node"))
-                    return ("node", scriptPath);
-                if (shebang.Contains("ruby"))
-                    return ("ruby", scriptPath);
-                
-                // Use the shebang directly if it's an absolute path
-                if (shebang.StartsWith("/") && File.Exists(shebang))
-                    return (shebang, scriptPath);
-            }
-        }
-        catch
-        {
-            // Ignore errors reading the file
-        }
-
-        // Default to bash on Unix-like systems, or make executable and run directly
-        if (OperatingSystem.IsWindows())
-            return (null, "");
-        
-        // Make the script executable and run it directly
-        try
-        {
-            RunCommandAsync("chmod", $"+x \"{scriptPath}\"").Wait();
-            return (scriptPath, "");
-        }
-        catch
-        {
-            return ("bash", scriptPath); // Fallback to bash
-        }
+        // For extensionless scripts, we'll handle shebang detection in the calling method
+        // since we need the full path to read the file
+        return ("bash", scriptFileName); // Default fallback
     }
 
     public async Task SearchPackagesAsync(string query)
@@ -467,10 +430,15 @@ public class PackageManager
 
     private static async Task RunCommandAsync(string command, string arguments)
     {
-        await RunCommandAsync(command, arguments, showOutput: false);
+        await RunCommandAsync(command, arguments, workingDirectory: null, showOutput: false);
     }
 
     private static async Task RunCommandAsync(string command, string arguments, bool showOutput)
+    {
+        await RunCommandAsync(command, arguments, workingDirectory: null, showOutput);
+    }
+
+    private static async Task RunCommandAsync(string command, string arguments, string? workingDirectory, bool showOutput)
     {
         var process = new Process
         {
@@ -480,7 +448,8 @@ public class PackageManager
                 Arguments = arguments,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
-                RedirectStandardError = true
+                RedirectStandardError = true,
+                WorkingDirectory = workingDirectory ?? Environment.CurrentDirectory
             }
         };
 
@@ -522,3 +491,4 @@ public class PackageManager
         }
     }
 }
+  

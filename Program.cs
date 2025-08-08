@@ -74,6 +74,16 @@ namespace Fur
                 await packageManager.ShowStatisticsAsync();
             });
 
+            // Update command
+            var updateCommand = new Command("update", "Update an installed package");
+            var updatePackageArg = new Argument<string>("package", "Package name to update");
+            updateCommand.AddArgument(updatePackageArg);
+            updateCommand.SetHandler(async (string package) =>
+            {
+                var packageManager = new PackageManager();
+                await packageManager.UpdatePackageAsync(package);
+            }, updatePackageArg);
+
             // Upgrade command
             var upgradeCommand = new Command("upgrade", "Upgrade a package to a specific version");
             var upgradeArg = new Argument<string>("package", "Package name with optional version (name@version)");
