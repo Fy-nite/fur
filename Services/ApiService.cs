@@ -19,7 +19,7 @@ public class ApiService : IDisposable
     }
 
     // For backward compatibility
-    public ApiService() : this(new[] { "http://testing.finite.ovh:8080" }) {}
+    public ApiService() : this(new[] { "http://finitenet.runasp.net" }) {}
 
     public async Task<FurConfig?> GetPackageInfoAsync(string packageName, string? version = null)
     {

@@ -60,3 +60,34 @@
 /run/media/charlies/the cat storage v2/fur/obj/Debug/net8.0/fur.pdb
 /run/media/charlies/the cat storage v2/fur/obj/Debug/net8.0/fur.genruntimeconfig.cache
 /run/media/charlies/the cat storage v2/fur/obj/Debug/net8.0/ref/fur.dll
+D:\fur\bin\Debug\net8.0\fur.exe
+D:\fur\bin\Debug\net8.0\fur.deps.json
+D:\fur\bin\Debug\net8.0\fur.runtimeconfig.json
+D:\fur\bin\Debug\net8.0\fur.dll
+D:\fur\bin\Debug\net8.0\fur.pdb
+D:\fur\bin\Debug\net8.0\System.CommandLine.dll
+D:\fur\bin\Debug\net8.0\cs\System.CommandLine.resources.dll
+D:\fur\bin\Debug\net8.0\de\System.CommandLine.resources.dll
+D:\fur\bin\Debug\net8.0\es\System.CommandLine.resources.dll
+D:\fur\bin\Debug\net8.0\fr\System.CommandLine.resources.dll
+D:\fur\bin\Debug\net8.0\it\System.CommandLine.resources.dll
+D:\fur\bin\Debug\net8.0\ja\System.CommandLine.resources.dll
+D:\fur\bin\Debug\net8.0\ko\System.CommandLine.resources.dll
+D:\fur\bin\Debug\net8.0\pl\System.CommandLine.resources.dll
+D:\fur\bin\Debug\net8.0\pt-BR\System.CommandLine.resources.dll
+D:\fur\bin\Debug\net8.0\ru\System.CommandLine.resources.dll
+D:\fur\bin\Debug\net8.0\tr\System.CommandLine.resources.dll
+D:\fur\bin\Debug\net8.0\zh-Hans\System.CommandLine.resources.dll
+D:\fur\bin\Debug\net8.0\zh-Hant\System.CommandLine.resources.dll
+D:\fur\obj\Debug\net8.0\fur.csproj.AssemblyReference.cache
+D:\fur\obj\Debug\net8.0\fur.GeneratedMSBuildEditorConfig.editorconfig
+D:\fur\obj\Debug\net8.0\fur.AssemblyInfoInputs.cache
+D:\fur\obj\Debug\net8.0\fur.AssemblyInfo.cs
+D:\fur\obj\Debug\net8.0\fur.csproj.CoreCompileInputs.cache
+D:\fur\obj\Debug\net8.0\fur.sourcelink.json
+D:\fur\obj\Debug\net8.0\fur.csproj.Up2Date
+D:\fur\obj\Debug\net8.0\fur.dll
+D:\fur\obj\Debug\net8.0\refint\fur.dll
+D:\fur\obj\Debug\net8.0\fur.pdb
+D:\fur\obj\Debug\net8.0\fur.genruntimeconfig.cache
+D:\fur\obj\Debug\net8.0\ref\fur.dll
