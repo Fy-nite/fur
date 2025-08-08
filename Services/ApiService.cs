@@ -8,6 +8,8 @@ public class ApiService : IDisposable
 {
     private readonly HttpClient _httpClient;
     private readonly string[] _baseUrls;
+    // Changed to HTTP for local development - update this when deploying
+    private const string BaseUrl = "http://finitenet.runasp.net"; 
 
     public ApiService(string[] baseUrls)
     {
